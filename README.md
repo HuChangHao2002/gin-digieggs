@@ -23,11 +23,3 @@ Before running this project, ensure that you have the following installed:
 - [MongoDB Compass](https://www.mongodb.com/products/compass) (optional, for managing MongoDB visually)
 - [Gin framework](https://github.com/gin-gonic/gin) (This is installed automatically by running `go mod`)
 
-## Setup
-
-### Step 1: Clone the repository
-Clone this repository to your local machine:
-
-```bash
-git clone https://github.com/yourusername/digieggs-api.git
-cd digieggs-api
