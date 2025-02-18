@@ -68,6 +68,7 @@ func main() {
 	r.GET("/eggs/:id", getEgg)   // Get DigiEgg by ID
 	r.PUT("/eggs/:id", updateEgg) // Update DigiEgg
 	r.DELETE("/eggs/:id", deleteEgg) // Delete DigiEgg
+	r.GET("/eggs/search", searchEggs) //Search Route
 
 	// Run the server
 	r.Run(":8080")
@@ -187,3 +188,35 @@ func deleteEgg(c *gin.Context) {
 
 	c.JSON(http.StatusOK, gin.H{"message": "Egg deleted"})
 }
+
+func searchEggs(c *gin.Context) {
+    name := c.DefaultQuery("name", "")
+    stage := c.DefaultQuery("stage", "")
+
+    filter := bson.M{}
+    if name != "" {
+        filter["name"] = bson.M{"$regex": name, "$options": "i"} // Case-insensitive search
+    }
+    if stage != "" {
+        filter["stage"] = stage
+    }
+
+    var eggs []DigiEgg
+
+    cursor, err := collection.Find(context.TODO(), filter)
+    if err != nil {
+        c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to search eggs"})
+        return
+    }
+    defer cursor.Close(context.TODO())
+
+    // Decode the results
+    for cursor.Next(context.TODO()) {
+        var egg DigiEgg
+        cursor.Decode(&egg)
+        eggs = append(eggs, egg)
+    }
+
+    c.JSON(http.StatusOK, eggs)
+}
+
